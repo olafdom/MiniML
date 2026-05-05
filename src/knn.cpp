@@ -2,8 +2,10 @@
 #include <utility>
 #include <stdexcept>
 #include <algorithm>
+#include <unordered_map>
 
 double KNN::getSquaredEuclideanDist(const std::vector<double>& p1, const std::vector<double>& p2) {
+
     double res = 0;
     for (int i = 0; i < dim; ++i) {
         res += (p1[i] - p2[i]) * (p1[i] - p2[i]);
@@ -12,6 +14,7 @@ double KNN::getSquaredEuclideanDist(const std::vector<double>& p1, const std::ve
 }
 
 double KNN::getSquaredEuclideanDist(int starting_idx, const std::vector<double> &p2) {
+
    double res = 0;
     for (int i = 0; i < dim; ++i) {
         res += (vectors[starting_idx + i] - p2[i]) * (vectors[starting_idx + i] - p2[i]);
@@ -23,8 +26,8 @@ KNN::KNN(int dim, std::vector<double> vectors, std::vector<int> labels, Distance
     dim(dim), 
     vectors(std::move(vectors)), 
     labels(std::move(labels)), 
-    distanceMetric(distanceMetric) 
-    { 
+    distanceMetric(distanceMetric) { 
+
         if (dim <= 0) {
             throw std::invalid_argument("Dimension must be greater than 0.");
         }
@@ -37,6 +40,7 @@ KNN::KNN(int dim, std::vector<double> vectors, std::vector<int> labels, Distance
     }
 
     int KNN::predict(const std::vector<double> &sample, int k) {
+
         if (sample.size() != dim) {
             throw std::invalid_argument("Given vector must have the correct dimension");
         }
@@ -45,6 +49,7 @@ KNN::KNN(int dim, std::vector<double> vectors, std::vector<int> labels, Distance
         }
 
         std::vector<std::pair<int, double>> dist; //index, distance
+        dist.reserve(vectors.size() / dim);
 
         for(int i = 0; i < vectors.size(); i += dim) {
             dist.push_back({i / dim, getSquaredEuclideanDist(i, sample)});
@@ -54,5 +59,19 @@ KNN::KNN(int dim, std::vector<double> vectors, std::vector<int> labels, Distance
             return p1.second < p2.second; 
         });
 
-        return 0;
+        std::unordered_map<int, int> occ;
+
+        for(int i = 0; i < k; ++i) {
+            occ[labels[dist[i].first]]++;
+        }
+
+        auto it = std::max_element(occ.begin(), occ.end(), 
+        [](const auto& a, const auto& b) {
+            return a.second < b.second;
+        });
+
+        int nearest_neighbour = -1;
+        if (it != occ.end()) nearest_neighbour = it->first;
+
+        return nearest_neighbour;
     }
