@@ -1,13 +1,22 @@
 #include "knn.hpp"
 #include <utility>
 #include <stdexcept>
+#include <algorithm>
 
 double KNN::getSquaredEuclideanDist(const std::vector<double>& p1, const std::vector<double>& p2) {
     double res = 0;
     for (int i = 0; i < dim; ++i) {
         res += (p1[i] - p2[i]) * (p1[i] - p2[i]);
     }
-    return sqrt(res);
+    return res;
+}
+
+double KNN::getSquaredEuclideanDist(int starting_idx, const std::vector<double> &p2) {
+   double res = 0;
+    for (int i = 0; i < dim; ++i) {
+        res += (vectors[starting_idx + i] - p2[i]) * (vectors[starting_idx + i] - p2[i]);
+    }
+    return res;
 }
 
 KNN::KNN(int dim, std::vector<double> vectors, std::vector<int> labels, DistanceMetric distanceMetric) : 
@@ -34,6 +43,16 @@ KNN::KNN(int dim, std::vector<double> vectors, std::vector<int> labels, Distance
         if (k >= vectors_count()) {
             throw std::invalid_argument("k must be less than the number of vectors in dataset");
         }
+
+        std::vector<std::pair<int, double>> dist; //index, distance
+
+        for(int i = 0; i < vectors.size(); i += dim) {
+            dist.push_back({i / dim, getSquaredEuclideanDist(i, sample)});
+        }
+
+        std::sort(dist.begin(), dist.end(), [](const std::pair<int, double> p1, const std::pair<int, double> p2) {
+            return p1.second < p2.second; 
+        });
 
         return 0;
     }
