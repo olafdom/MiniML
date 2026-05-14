@@ -13,11 +13,20 @@ double KNN::getSquaredEuclideanDist(const std::vector<double>& p1, const std::ve
     return res;
 }
 
-double KNN::getSquaredEuclideanDist(int starting_idx, const std::vector<double> &p2) {
+double KNN::getSquaredEuclideanDist(int starting_idx, const std::vector<double> &p) {
 
    double res = 0;
     for (int i = 0; i < dim; ++i) {
-        res += (vectors[starting_idx + i] - p2[i]) * (vectors[starting_idx + i] - p2[i]);
+        res += (vectors[starting_idx + i] - p[i]) * (vectors[starting_idx + i] - p[i]);
+    }
+    return res;
+}
+
+double KNN::getManhattanDist(int starting_idx, const std::vector<double> &p)
+{
+    double res = 0;
+    for(int i = 0; i < dim; ++i) {
+        res += abs(vectors[starting_idx + i] - p[i]);
     }
     return res;
 }
@@ -51,10 +60,17 @@ KNN::KNN(int dim, std::vector<double> vectors, std::vector<int> labels, Distance
         std::vector<std::pair<int, double>> dist; //index, distance
         dist.reserve(vectors.size() / dim);
 
-        for(int i = 0; i < vectors.size(); i += dim) {
-            dist.push_back({i / dim, getSquaredEuclideanDist(i, sample)});
+        if(distanceMetric == DistanceMetric::EUCLIDEAN) {
+            for(int i = 0; i < vectors.size(); i += dim) {
+                dist.push_back({i / dim, getSquaredEuclideanDist(i, sample)});
+            }
         }
-
+        else if(distanceMetric == DistanceMetric::MANHATTAN) {
+            for(int i = 0; i < vectors.size(); i += dim) {
+                dist.push_back({i / dim, getManhattanDist(i, sample)});
+            }
+        }
+        
         std::sort(dist.begin(), dist.end(), [](const std::pair<int, double> p1, const std::pair<int, double> p2) {
             return p1.second < p2.second; 
         });
