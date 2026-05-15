@@ -36,3 +36,5 @@ cmake-build-release/
 
 .DS_Store
 Thumbs.db
+
+sandbox/
