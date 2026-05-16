@@ -11,7 +11,6 @@ private:
     std::vector<T> elements;
 
 public:
-    // Konstruktor 1
     Matrix(int r, int c) : rows_count(r), cols_count(c) {
         if (rows_count <= 0 || cols_count <= 0) {
             throw std::invalid_argument("Matrix dimensions must be positive!");
@@ -19,7 +18,6 @@ public:
         elements.resize(r * c, T{});
     }
 
-    // Konstruktor 2
     Matrix(int r, int c, const std::vector<T>& elems) : rows_count(r), cols_count(c), elements(elems) {
         if (elements.size() != static_cast<size_t>(r * c)) {
             throw std::invalid_argument("Number of elements does not match!");
