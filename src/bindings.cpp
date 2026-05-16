@@ -1,11 +1,22 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h> 
 #include "knn.hpp"
+#include "matrix.hpp"
 
 namespace py = pybind11;
 
 PYBIND11_MODULE(_core, m) {
     m.doc() = "MiniML: A high-performance KNN library written in C++ with Python bindings";
+
+    py::class_<Matrix<double>>(m, "Matrix")
+        .def(py::init<int, int>()) // Pierwszy konstruktor
+        .def(py::init<int, int, const std::vector<double>&>()) // Drugi konstruktor z danymi
+        .def("rows", &Matrix<double>::rows)
+        .def("cols", &Matrix<double>::cols)
+        .def("get_elements", &Matrix<double>::get_elements)
+        .def("transpose", &Matrix<double>::transpose)
+        .def("dot", &Matrix<double>::dot)
+        .def("__add__", &Matrix<double>::operator+);
 
     py::enum_<DistanceMetric>(m, "DistanceMetric")
         .value("EUCLIDEAN", DistanceMetric::EUCLIDEAN)
