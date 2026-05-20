@@ -1,4 +1,4 @@
-from ._core import KNN as KNNEngine, DistanceMetric
+from . import _core 
 import numpy as np
 
 class KNN():
@@ -10,16 +10,21 @@ class KNN():
             initial_data: Initial data for the KNN algorithm
             labels: Labels for the given data
         """
+
+        #trzeba tutaj zdecydowanie dodać walidację tych danych wejściowych, bo usunąłem to z bindings.cpp
+
         metric_normalized = metric.strip().lower()
         if metric_normalized == "euclidean":
-            self._metric = DistanceMetric.EUCLIDEAN
+            self._metric = _core.DistanceMetric.EUCLIDEAN
         elif metric_normalized == "manhattan":
-            self._metric = DistanceMetric.MANHATTAN
+            self._metric = _core.DistanceMetric.MANHATTAN
         else:
             raise ValueError('Given metric is not defined')
+
         np_data = np.asarray(initial_data, dtype=np.float64)
         np_labels = np.asarray(labels, dtype=np.int32)
-        self._cpp_engine = KNNEngine(np_data, np_labels, self._metric)
+
+        self._cpp_knn = _core._KNN(np_data, np_labels, self._metric)
 
     def predict(self, sample, k: int=3) -> int:
         """
@@ -33,4 +38,4 @@ class KNN():
             Predicted label.
         """
         np_sample = np.asarray(sample, dtype=np.float64)
-        return self._cpp_engine.predict(sample, k)
+        return self._cpp_knn.predict(np_sample, k)
