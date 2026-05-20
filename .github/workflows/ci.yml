@@ -30,7 +30,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           # Instalujemy pytest, pybind11 i pandas do czytania CSV
-          python -m pip install pytest pybind11 pandas
+          python -m pip install pytest pybind11 pandas numpy
 
       - name: ️ Kompilacja biblioteki C++ i instalacja miniml
         run: |

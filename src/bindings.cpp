@@ -1,5 +1,6 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h> 
+#include <pybind11/numpy.h>
 #include "knn.hpp"
 #include "matrix.hpp"
 
@@ -24,32 +25,33 @@ PYBIND11_MODULE(_core, m) {
         .export_values();
 
     py::class_<KNN>(m, "KNN")
-        .def(py::init([](std::vector<std::vector<double>> input_list, 
-                         std::vector<int> labels, 
+        .def(py::init([](py::array_t<double> input_list, 
+                         py::array_t<int> labels, 
                          DistanceMetric metric) {
             
-            if (input_list.empty()) {
-                throw std::invalid_argument("Input data cannot be empty.");
+            py::buffer_info data_buf = input_list.request();
+            py::buffer_info labels_buf = labels.request();
+
+            if (data_buf.ndim != 2) {
+                throw std::invalid_argument("Input data must be a 2D NumPy array.");
+            }
+            if (labels_buf.ndim != 1) {
+                throw std::invalid_argument("Labels must be a 1D NumPy array.");
+            }
+            if (data_buf.shape[0] != labels_buf.shape[0]) {
+                throw std::invalid_argument("Number of labels must match the number of rows in data.");
             }
 
-            size_t rows = input_list.size();
-            size_t cols = input_list[0].size();
-            
-            if (labels.size() != rows) {
-                throw std::invalid_argument("Number of labels must match the number of input vectors.");
-            }
+            int rows = data_buf.shape[0];
+            int cols = data_buf.shape[1];
 
-            std::vector<double> flat_data;
-            flat_data.reserve(rows * cols);
+            double* data_ptr = static_cast<double*>(data_buf.ptr);
+            int* labels_ptr = static_cast<int*>(labels_buf.ptr);
 
-            for (const auto& row : input_list) {
-                if (row.size() != cols) {
-                    throw std::invalid_argument("All input vectors must have the same dimension.");
-                }
-                flat_data.insert(flat_data.end(), row.begin(), row.end());
-            }
+            std::vector<double> flat_data(data_ptr, data_ptr + (rows * cols));
+            std::vector<int> labels_vec(labels_ptr, labels_ptr + rows);
 
-            return new KNN(static_cast<int>(cols), std::move(flat_data), std::move(labels), metric);
+            return new KNN(cols, std::move(flat_data), std::move(labels_vec), metric);
         }))
         
         .def("predict", &KNN::predict, 
