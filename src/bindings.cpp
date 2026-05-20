@@ -9,9 +9,19 @@ namespace py = pybind11;
 PYBIND11_MODULE(_core, m) {
     m.doc() = "MiniML: A high-performance KNN library written in C++ with Python bindings";
 
-    py::class_<Matrix<double>>(m, "Matrix")
-        .def(py::init<int, int>()) // Pierwszy konstruktor
-        .def(py::init<int, int, const std::vector<double>&>()) // Drugi konstruktor z danymi
+    py::class_<Matrix<double>>(m, "_Matrix")
+        .def(py::init([](py::array_t<double> input_array) {
+            py::buffer_info buf = input_array.request();
+            
+            int rows = buf.shape[0];
+            int cols = buf.shape[1];
+            
+            double* ptr = static_cast<double*>(buf.ptr);
+
+            std::vector<double> flat_data(ptr, ptr + (rows * cols));
+            
+            return new Matrix<double>(rows, cols, flat_data);
+        }))
         .def("rows", &Matrix<double>::rows)
         .def("cols", &Matrix<double>::cols)
         .def("get_elements", &Matrix<double>::get_elements)
@@ -24,23 +34,13 @@ PYBIND11_MODULE(_core, m) {
         .value("MANHATTAN", DistanceMetric::MANHATTAN)
         .export_values();
 
-    py::class_<KNN>(m, "KNN")
+    py::class_<KNN>(m, "_KNN")
         .def(py::init([](py::array_t<double> input_list, 
                          py::array_t<int> labels, 
                          DistanceMetric metric) {
             
             py::buffer_info data_buf = input_list.request();
             py::buffer_info labels_buf = labels.request();
-
-            if (data_buf.ndim != 2) {
-                throw std::invalid_argument("Input data must be a 2D NumPy array.");
-            }
-            if (labels_buf.ndim != 1) {
-                throw std::invalid_argument("Labels must be a 1D NumPy array.");
-            }
-            if (data_buf.shape[0] != labels_buf.shape[0]) {
-                throw std::invalid_argument("Number of labels must match the number of rows in data.");
-            }
 
             int rows = data_buf.shape[0];
             int cols = data_buf.shape[1];
@@ -53,7 +53,6 @@ PYBIND11_MODULE(_core, m) {
 
             return new KNN(cols, std::move(flat_data), std::move(labels_vec), metric);
         }))
-        
         .def("predict", &KNN::predict, 
              py::arg("sample"), 
              py::arg("k"),
