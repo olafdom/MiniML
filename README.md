@@ -1,6 +1,9 @@
-# MiniML 
-
+# MiniML
 ML library, with its core written in C++, and a Python interface provided via `pybind11` and `scikit-build-core`.
+## Disclaimer: Educational Project / Work in Progress
+This library is actively under development and serves primarily as a personal learning project to explore C++ performance optimization and Python bindings via pybind11.
+
+It is NOT ready for production use.
 
 ## Requirements
 
