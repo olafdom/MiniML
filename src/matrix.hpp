@@ -20,14 +20,14 @@ public:
 
     Matrix(int r, int c, const std::vector<T>& elems) : rows_count(r), cols_count(c), elements(elems) {
         if (elements.size() != static_cast<size_t>(r * c)) {
-            throw std::invalid_argument("Number of elements does not match!");
+            throw std::invalid_argument("Number of elements does not match the specified dimensions!");
         }
     }
 
     int rows() const { return rows_count; }
     int cols() const { return cols_count; }
 
-    // Operatory dostępu do elementów
+    // Element access operators
     T& operator()(int r, int c) {
         return elements[r * cols_count + c];
     }
@@ -40,10 +40,10 @@ public:
         return elements;
     }
 
-    // Dodawanie macierzy
+    // Matrix addition
     Matrix<T> operator+(const Matrix<T>& other) const {
         if (rows_count != other.rows_count || cols_count != other.cols_count) {
-            throw std::invalid_argument("Matrix dimensions must be matching!");
+            throw std::invalid_argument("Matrix dimensions must match for addition!");
         }
 
         Matrix<T> result(rows_count, cols_count);
@@ -53,7 +53,7 @@ public:
         return result;
     }
 
-    // Transpozycja
+    // Transposition
     Matrix<T> transpose() const {
         Matrix<T> result(cols_count, rows_count);
         for (int r = 0; r < rows_count; ++r) {
@@ -64,10 +64,10 @@ public:
         return result;
     }
 
-    // Mnożenie macierzy (Dot product)
+    // Matrix multiplication (Dot product)
     Matrix<T> dot(const Matrix<T>& other) const {
         if (this->cols_count != other.rows_count) {
-            throw std::invalid_argument("Matrix dimension must be matching");
+            throw std::invalid_argument("Matrix dimensions must match for multiplication!");
         }
 
         Matrix<T> result(this->rows_count, other.cols_count);
