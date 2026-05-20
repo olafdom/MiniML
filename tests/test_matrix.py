@@ -1,6 +1,5 @@
 import pytest
-# Zakładam, że w miniml/__init__.py macie zaimportowaną klasę Matrix z Waszego modułu C++
-from miniml import Matrix
+from miniml import MATRIX
 
 def test_matrix_creation_and_dimensions():
     """Sprawdza, czy macierz poprawnie się tworzy i przechowuje wymiary."""
