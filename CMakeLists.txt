@@ -10,6 +10,7 @@ find_package(pybind11 CONFIG REQUIRED)
 pybind11_add_module(_core 
     src/knn.cpp 
     src/bindings.cpp
+    src/utils/metrics.cpp
 )
 
 install(TARGETS _core DESTINATION miniml)

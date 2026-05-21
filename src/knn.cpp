@@ -1,4 +1,5 @@
 #include "knn.hpp"
+#include "utils/metrics.hpp"
 #include <utility>
 #include <stdexcept>
 #include <algorithm>
@@ -22,8 +23,7 @@ double KNN::getSquaredEuclideanDist(int starting_idx, const std::vector<double> 
     return res;
 }
 
-double KNN::getManhattanDist(int starting_idx, const std::vector<double> &p)
-{
+double KNN::getManhattanDist(int starting_idx, const std::vector<double> &p) {
     double res = 0;
     for(int i = 0; i < dim; ++i) {
         res += abs(vectors[starting_idx + i] - p[i]);
