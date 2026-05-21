@@ -1,17 +1,5 @@
 #include "knn.hpp"
 
-double KNN::getSquaredEuclideanDist(const std::vector<double>& p1, const std::vector<double>& p2) {
-   return miniml::metrics::getSquaredEuclideanDist(p1, p2);
-}
-
-double KNN::getSquaredEuclideanDist(int starting_idx, const std::vector<double> &p) {
-   return miniml::metrics::getSquaredEuclideanDist(vectors, starting_idx, p, dim);
-}
-
-double KNN::getManhattanDist(int starting_idx, const std::vector<double> &p) {
-    return miniml::metrics::getManhattanDist(vectors, starting_idx, p, dim);
-}
-
 KNN::KNN(int dim, std::vector<double> vectors, std::vector<int> labels, DistanceMetric distanceMetric) : 
     dim(dim), 
     vectors(std::move(vectors)), 
@@ -43,12 +31,12 @@ KNN::KNN(int dim, std::vector<double> vectors, std::vector<int> labels, Distance
 
         if(distanceMetric == DistanceMetric::EUCLIDEAN) {
             for(int i = 0; i < vectors.size(); i += dim) {
-                dist.push_back({i / dim, getSquaredEuclideanDist(i, sample)});
+                dist.push_back({i / dim, miniml::metrics::getManhattanDist(vectors, i, sample, dim)});
             }
         }
         else if(distanceMetric == DistanceMetric::MANHATTAN) {
             for(int i = 0; i < vectors.size(); i += dim) {
-                dist.push_back({i / dim, getManhattanDist(i, sample)});
+                dist.push_back({i / dim, miniml::metrics::getManhattanDist(vectors, i, sample, dim)});
             }
         }
         

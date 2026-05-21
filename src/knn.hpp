@@ -18,9 +18,6 @@ class KNN {
     std::vector<int> labels; //i-th vector label is labels[i]
     DistanceMetric distanceMetric = DistanceMetric::EUCLIDEAN; //distance metrics
     int vectors_count() { return vectors.size() / dim; } 
-    double getSquaredEuclideanDist(const std::vector<double>& p1, const std::vector<double>& p2);
-    double getSquaredEuclideanDist(int starting_idx, const std::vector<double>& p2);
-    double getManhattanDist(int starting_idx, const std::vector<double>& p2);
 public:
     KNN(int dim, std::vector<double> vectors, std::vector<int> labels, DistanceMetric distanceMetric = DistanceMetric::EUCLIDEAN);
     int predict(const std::vector<double>& sample, int k);
