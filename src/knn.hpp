@@ -1,5 +1,11 @@
 #pragma once 
 #include<vector>
+#include "utils/metrics.hpp"
+#include <utility>
+#include <stdexcept>
+#include <algorithm>
+#include <unordered_map>
+
 
 enum class DistanceMetric {
     EUCLIDEAN,
